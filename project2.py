@@ -96,6 +96,7 @@ def bruteForce(points):
                 pt2 = points[j]
     end = time.time()
     totalTime = (end-start) * 1000
+    d = 0 if math.isclose(d, sys.maxsize) else d
     return Result(pt1, pt2, d, len(points), totalTime, "brute")
 
 # Divide-And-Conquer algorithm for finding the smallest distance between two points
