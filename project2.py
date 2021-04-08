@@ -4,7 +4,7 @@
 # Spring 2021
 # Ben McClure
 
-import sys
+import sys, math
 
 # Class representing a Point
 # 'x' is the x coordinate of the point
@@ -35,7 +35,7 @@ class Result:
         self.point2 = point2
         self.distance = distance
     def __str__(self):
-     return "foo"
+     return "{}".format(self.distance)
 
 # Function to process the file and make a list of points
 # Usage: getPoints() -> List<Point>
@@ -48,22 +48,40 @@ def getPoints():
             strip = line.rstrip('\n')
             l = strip.split(' ') 
             pt = Point(int(l[0]), int(l[1])) # make the point here, assuming it's [x,y]
-            print(pt)
             # append to list
             points.append(pt)
         lineNum = lineNum + 1
 
     return points
 
-# Function to print out a result
-# Usage: stringifyResult( Result ) -> String
-def stringifyResult(res):
-    return 'stringify'
+# Function to calculate the distance
+# Usage: calcDistance(Point, Point) -> int
+def calcDistance(pt1, pt2):
+    #(x1-x2)^2 + (y1-y2)^2 
+    leftSide = (pt2.x - pt1.x)**2
+    rightSide = (pt2.y - pt1.y)**2
+    distance = math.sqrt(leftSide +  rightSide)
+    return distance
+
 
 # Brute force algorithm for finding the smallest distance between two points
 # Usage: bruteForce( List<Point> ) -> Result
 def bruteForce(points):
-    return Result(None, None, None)
+    # stub some points out and distance
+    pt1 = Point(None, None)
+    pt2 = Point(None, None)
+    d = sys.maxsize
+
+    #time to compare them
+    for i in range(len(points)):
+        for j in range(i+1, len(points)):
+            calc = calcDistance(points[i], points[j])
+            if (d > calc):
+                d = calc
+                pt1 = points[i]
+                pt2 = points[j]
+    
+    return Result(pt1, pt2, d)
 
 # Divide-And-Conquer algorithm for finding the smallest distance between two points
 # Usage: divideAndConquer( List<Point> ) -> Result
@@ -80,20 +98,17 @@ def main(argv):
         result = divideAndConquer(points) 
     if (len(argv) > 0):
         if (argv[0] == 'brute'):
-            print('Brute Method')
             result = bruteForce(points)
         elif (argv[0] == 'divide'):
-            print('Divide and Conquer Method')
             result = divideAndConquer(points)
         elif (argv[0] == 'both'):
-            print('Both Methods')
             result = divideAndConquer(points)
             auxResult = bruteForce(points)
             auxResultUsed = True
     
-    print(stringifyResult(result))
+    print(result)
     if (auxResultUsed):
-        print(stringifyResult(auxResult))
+        print(auxResult)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
