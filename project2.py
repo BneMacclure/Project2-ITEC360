@@ -17,6 +17,9 @@ class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+    def __str__(self):
+        s = "{} {}".format(self.x,self.y)
+        return s
 
 
 # Class representing a Result, the smallest distanc between two points
@@ -31,21 +34,31 @@ class Result:
         self.point1 = point1
         self.point2 = point2
         self.distance = distance
+    def __str__(self):
+     return "foo"
 
 # Function to process the file and make a list of points
 # Usage: getPoints() -> List<Point>
 def getPoints():
     points = []
+    lineNum = 1
     for line in sys.stdin:
         # make the points
-        print('TODO')
-        # append to list
+        if (lineNum > 1):
+            strip = line.rstrip('\n')
+            l = strip.split(' ') 
+            pt = Point(int(l[0]), int(l[1])) # make the point here, assuming it's [x,y]
+            print(pt)
+            # append to list
+            points.append(pt)
+        lineNum = lineNum + 1
+
     return points
 
 # Function to print out a result
 # Usage: stringifyResult( Result ) -> String
 def stringifyResult(res):
-    print('got it')
+    return 'stringify'
 
 # Brute force algorithm for finding the smallest distance between two points
 # Usage: bruteForce( List<Point> ) -> Result
@@ -63,12 +76,17 @@ def main(argv):
     result = Result(None, None, None) # primary result
     auxResult = Result(None, None, None) # used if there is both in use
     auxResultUsed = False
+    if (len(argv) == 0): # default is divide and conquer if not input
+        result = divideAndConquer(points) 
     if (len(argv) > 0):
         if (argv[0] == 'brute'):
+            print('Brute Method')
             result = bruteForce(points)
         elif (argv[0] == 'divide'):
+            print('Divide and Conquer Method')
             result = divideAndConquer(points)
         elif (argv[0] == 'both'):
+            print('Both Methods')
             result = divideAndConquer(points)
             auxResult = bruteForce(points)
             auxResultUsed = True
