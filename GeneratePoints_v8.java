@@ -1,11 +1,18 @@
 import java.util.*;
 import java.util.regex.*;
+
+/* To compile&run this file (needing only java 8 or higher):
+ *     javac GeneratePoints_v8.java
+ *     java  GeneratePoints_v8
+ */
+
+
 /** A utility class for generating inputs for `closest`. 
  * Prints to stdout.
  *
  * @see https://www.radford.edu/itec360/2021spring-ibarland/Homeworks/Proj02/proj02.html#input
  * @author ibarland
- * @version 2021-mar-27
+ * @version 2021-apr-07
  * @license CC-BY; a URL to this original file suffices as attribution.
  *
  * Currently supports the mthds @{knownMthds}.
@@ -14,12 +21,12 @@ import java.util.regex.*;
  * a random-number generator (may or may not be used, depending on the method),
  * plus 0 or more strings (may or may not be used, depending on the method).
  */
-public class GeneratePoints{
-    static List<String> knownMthds = List.of("rand","circ","test");
-    static String executable = "java " + getMainClassName("GeneratePoints");
+public class GeneratePoints_v8 {
+    static final List<String> knownMthds = List_of("rand","circ","test");
+    static final String executable = "java " + getMainClassName("GeneratePoints_v8");
 
-    static String USAGE =
-        "Usage:\n"
+    static final String USAGE =
+          "Usage:\n"
         + "    " + executable + " [-s <seed>] <n> <mthd> [<other-args>…]\n"
         + "where:\n"
         + "    <n> is a number-of-points (natnum <= " + Integer.MAX_VALUE + "),\n"
@@ -34,7 +41,7 @@ public class GeneratePoints{
         + "    " + executable + "  8 circ" + "\n"
         + "    " + executable + "  4 circ 10 800 800" + "\n"
         + "\n"
-        + "Supported mthds for generating points:\n"
+        + "Supported <mthd>s for generating points:\n"
         + "   rand: generate points randomly\n"
         + "   circ: generate points roughly in a circle; other-args: r,x,y (all optional)\n"
         ;
@@ -58,10 +65,10 @@ public class GeneratePoints{
     static String rand( int n, Random rng ) { return rand( n, rng.ints(2*n).iterator() ); }
 
     static void testRand() {
-        var natnums = new Iterator<Integer>() { private int i=0;  
-                                                public Integer next() { return i++;}  
-                                                public boolean hasNext() { return true; }
-                                              };
+        Iterator<Integer> natnums = new Iterator<Integer>() { private int i=0;  
+                                                              public Integer next() { return i++;}  
+                                                              public boolean hasNext() { return true; }
+                                                            };
         assert rand( 0,natnums).equals("");
         assert rand( 1,natnums).equals("0 1\n");
         assert rand( 2,natnums).equals("2 3\n4 5\n");
@@ -127,11 +134,12 @@ public class GeneratePoints{
         final Random   rng       =   (Random)configs[3];
         // too bad we don't have pattern-matching to help combine the above lines into 1.
 
-        String pts = switch(mthd) {
-            case "rand" -> rand(n, rng);
-            case "circ" -> circ(n, otherArgs ); 
-            case "test" -> { testAll(true); System.exit(0); yield "[unreachable code?!]"; }
-            default     -> "[huh? unreachable code?!]";
+        String pts = "appease";
+        switch(mthd) {
+            case "rand" : pts = rand(n, rng); break;
+            case "circ" : pts = circ(n, otherArgs );  break;
+            case "test" : testAll(true); System.exit(0);  break;
+            default     : pts = "[huh? unreachable code?!]"; break;
             };
 
         System.out.printf("%d\n%s", n, pts);
@@ -195,28 +203,28 @@ public class GeneratePoints{
         Object[] actual;   //  actual will contains 4 Objects: n,mthd,mthdArgs,rng
         Random expectedRng;
 
-        actual = getConfigsFromArgs( new String[]{ "50", "actCool"},  22L,  List.of("actCool","actDorky","sitTight") );
+        actual = getConfigsFromArgs( new String[]{ "50", "actCool"},  22L,  List_of("actCool","actDorky","sitTight") );
         assert (int)(Integer)actual[0] == 50;
         assert actual[1].equals("actCool");
         assert Arrays.deepEquals( (String[])actual[2], new String[]{} );
         assert ((Random)actual[3]).nextInt() == (new Random(22L)).nextInt();
 
         // check "-s"
-        actual = getConfigsFromArgs( new String[]{ "-s", "99", "50", "actCool"},  22L,  List.of("actCool","actDorky","sitTight") );
+        actual = getConfigsFromArgs( new String[]{ "-s", "99", "50", "actCool"},  22L,  List_of("actCool","actDorky","sitTight") );
         assert (int)(Integer)actual[0] == 50;
         assert actual[1].equals("actCool");
         assert Arrays.deepEquals( (String[])actual[2], new String[]{} );
         assert ((Random)actual[3]).nextInt() == (new Random(99)).nextInt();
 
         // check "--seed"
-        actual = getConfigsFromArgs( new String[]{ "--seed", "99", "50", "actCool"},  22L,  List.of("actCool","actDorky","sitTight") );
+        actual = getConfigsFromArgs( new String[]{ "--seed", "99", "50", "actCool"},  22L,  List_of("actCool","actDorky","sitTight") );
         assert (int)(Integer)actual[0] == 50;
         assert actual[1].equals("actCool");
         assert Arrays.deepEquals( (String[])actual[2], new String[]{} );
         assert ((Random)actual[3]).nextInt() == (new Random(99)).nextInt();
 
         // check add'l args
-        actual = getConfigsFromArgs( new String[]{ "44", "actDorky", "extra-arg-1", "extra-arg-2"},  22L,  List.of("actCool","actDorky","sitTight") );
+        actual = getConfigsFromArgs( new String[]{ "44", "actDorky", "extra-arg-1", "extra-arg-2"},  22L,  List_of("actCool","actDorky","sitTight") );
         assert (int)(Integer)actual[0] == 44;
         assert actual[1].equals("actDorky");
         assert Arrays.deepEquals( (String[])actual[2], new String[]{"extra-arg-1","extra-arg-2"} );
@@ -242,7 +250,7 @@ public class GeneratePoints{
         }
     static void printUsageAndExit(int exitCode) { printUsageAndExit(exitCode, null); }
 
-    static void dprintf( String fmt, Object... itms ) { System.err.printf(fmt+"\n", itms);
+    static void dprintf( String fmt, Object... itms ) { //System.err.printf(fmt+"\n", itms);
                                                       }
 
     /** Throw an error, if we are running w/o -enableassertions.
@@ -268,8 +276,10 @@ public class GeneratePoints{
      */
     public static String getMainClassName(String fallback) {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+	dprintf( "the trace: %s", Arrays.toString(trace));
         return (trace.length > 0)  ?  trace[trace.length-1].getClassName()  :  fallback;
         }
-    public static String getMainClassName() { return getMainClassName("[unknown]"); }
+    public static String getMainClassName() { return getMainClassName("[unspecified]"); }
 
+    static <T> List<T> List_of( T... elements ) { return Arrays.asList(elements);}
     }

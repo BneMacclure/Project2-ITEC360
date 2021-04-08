@@ -30,12 +30,24 @@ class Point:
 # Result( Point(1,2), Point(3,4), 2)
 # Result( Point(1,1), Point(3,4), 3)
 class Result:
-    def __init__(self, point1, point2, distance):
+    def __init__(self, point1, point2, distance, n, time, method):
         self.point1 = point1
         self.point2 = point2
         self.distance = distance
+        self.n = n
+        self.method = method
+        self.time = time
     def __str__(self):
-     return "{}".format(self.distance)
+        # 5 25 (0,0) (3,4) n=4 brute      0.001s
+        return "{:g} {} ({},{}) ({},{}) n={} {} {:9.3f}".format(self.distance, 
+                                                    self.distance**2, 
+                                                    self.point1.x,
+                                                    self.point1.y,
+                                                    self.point2.x,
+                                                    self.point2.y,
+                                                    self.n,
+                                                    self.method,
+                                                    self.time)
 
 # Function to process the file and make a list of points
 # Usage: getPoints() -> List<Point>
@@ -63,7 +75,6 @@ def calcDistance(pt1, pt2):
     distance = math.sqrt(leftSide +  rightSide)
     return distance
 
-
 # Brute force algorithm for finding the smallest distance between two points
 # Usage: bruteForce( List<Point> ) -> Result
 def bruteForce(points):
@@ -71,28 +82,32 @@ def bruteForce(points):
     pt1 = Point(None, None)
     pt2 = Point(None, None)
     d = sys.maxsize
+    import time
+
+    start = time.time()
 
     #time to compare them
     for i in range(len(points)):
-        for j in range(i+1, len(points)):
+        for j in range(i+1, len(points)): # don't want to compare a point to itself
             calc = calcDistance(points[i], points[j])
             if (d > calc):
                 d = calc
                 pt1 = points[i]
                 pt2 = points[j]
-    
-    return Result(pt1, pt2, d)
+    end = time.time()
+    totalTime = (end-start) * 1000
+    return Result(pt1, pt2, d, len(points), totalTime, "brute")
 
 # Divide-And-Conquer algorithm for finding the smallest distance between two points
 # Usage: divideAndConquer( List<Point> ) -> Result
 def divideAndConquer(points):
-    return Result(None, None, None)
+    return Result(None, None, None, len(points), "divide")
 
 # Main Driver of file
 def main(argv):
     points = getPoints() # get list of points
-    result = Result(None, None, None) # primary result
-    auxResult = Result(None, None, None) # used if there is both in use
+    result = Result(None, None, None, None, None, None) # primary result
+    auxResult = Result(None, None, None, None, None, None) # used if there is both in use
     auxResultUsed = False
     if (len(argv) == 0): # default is divide and conquer if not input
         result = divideAndConquer(points) 
