@@ -41,8 +41,19 @@ class Result:
         self.time = time
     def __str__(self):
         # 5 25 (0,0) (3,4) n=4 brute      0.001s
-        return "{:g} {} ({},{}) ({},{}) n={} {} {:9.3f}".format(self.distance, 
+        if distance is not None:
+            return "{:g} {} ({},{}) ({},{}) n={} {} {:9.3f}".format(self.distance, 
                                                     self.distance**2, 
+                                                    self.point1.x,
+                                                    self.point1.y,
+                                                    self.point2.x,
+                                                    self.point2.y,
+                                                    self.n,
+                                                    self.method,
+                                                    self.time)
+        else:
+            return "{:g} {} ({},{}) ({},{}) n={} {} {:9.3f}".format(self.distance, 
+                                                    self.distance, 
                                                     self.point1.x,
                                                     self.point1.y,
                                                     self.point2.x,
@@ -213,25 +224,28 @@ def divideAndConquer(points):
     
 
     start = time.time()
-    # 1) sort the points by X coordinate
-    sortedPoints = sortByX(points) 
+    if len(points) > 0:
+        # 1) sort the points by X coordinate
+        sortedPoints = sortByX(points) 
 
-    # 2 ) Divde
-    res = divideHelper(sortedPoints)
+        # 2 ) Divde
+        res = divideHelper(sortedPoints)
 
-    # 3) Conquer
-    d = res.distance
-    divide = round(len(sortedPoints)/2)
-    dividePt = sortedPoints[divide]
-    lower = dividePt.x - d
-    upper = dividePt.x + d
-    strip = sortedPoints
-    # print('x: {}, y: {}'.format(dividePt.x, dividePt.y))
-    # print('lower/upper/divide/d: {} {} {} {}'.format(lower, upper, divide, d))
-    filter(lambda pt: pt.x <= upper and pt.x >= lower, strip)
-    strip = sortByY(strip)
-    res = conquerHelper(res, strip, divide)
-    
+        # 3) Conquer
+        d = res.distance
+        divide = round(len(sortedPoints)/2)
+        dividePt = sortedPoints[divide]
+        lower = dividePt.x - d
+        upper = dividePt.x + d
+        strip = sortedPoints
+        # print('x: {}, y: {}'.format(dividePt.x, dividePt.y))
+        # print('lower/upper/divide/d: {} {} {} {}'.format(lower, upper, divide, d))
+        filter(lambda pt: pt.x <= upper and pt.x >= lower, strip)
+        strip = sortByY(strip)
+        res = conquerHelper(res, strip, divide)
+    else:
+        res = Result(None, None, None, 0, 0, 'divide')
+        
     # 3) Set the result
     end = time.time()
     totalTime = (end-start) * 1000

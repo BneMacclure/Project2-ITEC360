@@ -4,7 +4,7 @@
 # Spring 2021
 # Ben McClure
 
-from closest import Point, Result, calcDistance, bruteForce, sortByX, dacHelper
+from closest import Point, Result, calcDistance, bruteForce, sortByX, divideHelper, conquerHelper, divideAndConquer
 import sys, math
 
 def main():
@@ -49,13 +49,18 @@ def main():
     assert (math.isclose(bruteForce(pts1).distance, 5)), "\nExpected: {}\nActual: {}".format(5,  bruteForce(pts1).distance)
     assert (math.isclose(bruteForce(pts2).distance, 0)), "\nExpected: {}\nActual: {}".format(0,  bruteForce(pts2).distance)
     assert (math.isclose(bruteForce(pts3).distance, 1)), "\nExpected: {}\nActual: {}".format(1,  bruteForce(pts3).distance)
-    
-    # tests for dacHelper
-    expected = Result(Point(3,4), Point(0,0), 5, 0, 0, 'divide')
-    assert (dacHelper(pts4) == expected), "\nExpected: {}\nActual: {}".format(expected, dacHelper(pts4))
-    assert (dacHelper(pts5) == 1), "\nExpected: {}\nActual: {}".format(1, dacHelper(pts5))
 
     # tests for divideAndConquer
+    expected = 5.0
+    actual = divideAndConquer(pts1).distance
+    assert(math.isclose(expected, actual)), "\nExpected: {}\nActual: {}".format(expected,  actual)
+    expected = None
+    actual = divideAndConquer(pts2).distance
+    assert (actual == expected), "\nExpected: {}\nActual: {}".format(expected,  actual)
+    expected = 1
+    actual = divideAndConquer(pts3).distance
+    assert (math.isclose(expected, actual)), "\nExpected: {}\nActual: {}".format(expected,  actual)
+
 
     print('ALL TESTS PASSED')
 
