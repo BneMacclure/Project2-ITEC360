@@ -91,6 +91,18 @@ def sortByX(points):
         bigX =    [ point for point in points if point.x > pivot.x ]  
         return  sortByX(smallX) + equalX + sortByX(bigX)
 
+# Function to quick sort the points by Y coordinate
+# Usage: sortByY(List<Point>) -> List<Point>
+def sortByY(points):
+    if points == []:
+        return []
+    else:
+        pivot = points[0]
+        equalY = [ point for point in points if point.y == pivot.y ]     
+        smallY =  [ point for point in points if point.y < pivot.y ]  
+        bigY =    [ point for point in points if point.y > pivot.y ]  
+        return  sortByY(smallY) + equalY + sortByY(bigY)
+
 # Brute force algorithm for finding the smallest distance between two points
 # Usage: bruteForce( List<Point> ) -> Result
 def bruteForce(points):
@@ -117,11 +129,12 @@ def bruteForce(points):
 
 # Divide and Conquer Helper function. does the divide
 # Contract: points cannot be empty or of size 1
+# Usage: divideHelper( List<Point> ) -> Result
 def divideHelper(points):
     # if it's a list of two points, return the distance
     if (len(points) == 2):
         res = Result(points[0], points[1], calcDistance(points[0], points[1]), 0, 0, 'divide')
-        print('Res of 2: {}'.format(res))
+        # print('Res of 2: {}'.format(res))
         return res
     # if it's a list of 3 points, calc the three distances and return the least one
     elif (len(points) == 3):
@@ -150,9 +163,39 @@ def divideHelper(points):
         return leftRes if leftRes.distance < rightRes.distance else rightRes
 
 # Divide and Conquer Helper function. does the conquer
-def conquerHelper(res, points):
+# Usage: conquerHelper( Result, List<Point> ) 
+# Res is the result from the initial analysis from dividing
+# strip is the section surrounding the divide point, with width size res.distance*2
+#       strip contains the points inside this 'strip', sorted by y coordinate
+# divide is the dividing line
+def conquerHelper(res, strip, divide):
+    shortestDist = res.distance
+    pt1 = res.point1
+    pt2 = res.point2
+    # Finding the shortest distance
+    for i in range(len(strip)):
+        if (i + 7 < len(strip)):
+            for j in range(i+1, i + 7): # only need to check 7 after the point
+                d = calcDistance(strip[i], strip[j])
+                if d < shortestDist:
+                    shortestDist =  d 
+                    pt1 = strip[i]
+                    pt2 = strip[j]
+                
+        else:
+            for j in range(i+1, len(strip)): # only need to check 7 after the point
+                d = calcDistance(strip[i], strip[j])
+                if d < shortestDist:
+                    shortestDist =  d 
+                    pt1 = strip[i]
+                    pt2 = strip[j]
+                
+    r =  res
+    r.distance = shortestDist
+    r.point1 = pt1
+    r.point2 = pt2
     
-
+    return r
  
 
 # Divide-And-Conquer algorithm for finding the smallest distance between two points
@@ -177,7 +220,17 @@ def divideAndConquer(points):
     res = divideHelper(sortedPoints)
 
     # 3) Conquer
-    res = conquerHelper(res, sortedPoints)
+    d = res.distance
+    divide = round(len(sortedPoints)/2)
+    dividePt = sortedPoints[divide]
+    lower = dividePt.x - d
+    upper = dividePt.x + d
+    strip = sortedPoints
+    # print('x: {}, y: {}'.format(dividePt.x, dividePt.y))
+    # print('lower/upper/divide/d: {} {} {} {}'.format(lower, upper, divide, d))
+    filter(lambda pt: pt.x <= upper and pt.x >= lower, strip)
+    strip = sortByY(strip)
+    res = conquerHelper(res, strip, divide)
     
     # 3) Set the result
     end = time.time()
