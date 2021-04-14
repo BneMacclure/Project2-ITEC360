@@ -4,7 +4,7 @@
 # Spring 2021
 # Ben McClure
 
-import sys, math
+import sys, math, time
 
 # Class representing a Point
 # 'x' is the x coordinate of the point
@@ -20,6 +20,8 @@ class Point:
     def __str__(self):
         s = "{} {}".format(self.x,self.y)
         return s
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
 
 # Class representing a Result, the smallest distanc between two points
@@ -48,6 +50,8 @@ class Result:
                                                     self.n,
                                                     self.method,
                                                     self.time)
+    def __eq__(self, other):
+        return self.point1 == other.point1 and self.point2 == other.point2 and self.distance == other.distance and self.n == other.n and self.method == other.method
 
 # Function to process the file and make a list of points
 # Usage: getPoints() -> List<Point>
@@ -75,6 +79,18 @@ def calcDistance(pt1, pt2):
     distance = math.sqrt(leftSide +  rightSide)
     return distance
 
+# Function to quick sort the points by X coordinate
+# Usage: sortByX(List<Point>) -> List<Point>
+def sortByX(points):
+    if points == []:
+        return []
+    else:
+        pivot = points[0]
+        equalX = [ point for point in points if point.x == pivot.x ]     
+        smallX =  [ point for point in points if point.x < pivot.x ]  
+        bigX =    [ point for point in points if point.x > pivot.x ]  
+        return  sortByX(smallX) + equalX + sortByX(bigX)
+
 # Brute force algorithm for finding the smallest distance between two points
 # Usage: bruteForce( List<Point> ) -> Result
 def bruteForce(points):
@@ -82,7 +98,7 @@ def bruteForce(points):
     pt1 = Point(None, None)
     pt2 = Point(None, None)
     d = sys.maxsize
-    import time
+    
 
     start = time.time()
 
@@ -99,10 +115,78 @@ def bruteForce(points):
     d = 0 if math.isclose(d, sys.maxsize) else d
     return Result(pt1, pt2, d, len(points), totalTime, "brute")
 
+# Divide and Conquer Helper function. does the divide
+# Contract: points cannot be empty or of size 1
+def divideHelper(points):
+    # if it's a list of two points, return the distance
+    if (len(points) == 2):
+        res = Result(points[0], points[1], calcDistance(points[0], points[1]), 0, 0, 'divide')
+        print('Res of 2: {}'.format(res))
+        return res
+    # if it's a list of 3 points, calc the three distances and return the least one
+    elif (len(points) == 3):
+        res = Result(points[0], points[1], sys.maxsize, None, None, None)
+        d1 = calcDistance(points[0], points[1])
+        d2 = calcDistance(points[0], points[2])
+        d3 = calcDistance(points[1], points[2])
+        # print('dists: {} {} {}'.format(d1,d2,d3))
+        res =  Result(points[0], points[1], d1, 0, 0, 'divide') if d1 < res.distance else res
+        res =  Result(points[0], points[2], d2, 0, 0, 'divide') if d2 < res.distance else res
+        res =  Result(points[1], points[2], d3, 0, 0, 'divide') if d3 < res.distance else res
+        # print('Res of 3: {}'.format(res))
+        return res
+    else:
+        length = len(points)
+        divide = round(length/2)
+        leftSide = points[0:divide]
+        rightSide = points[divide:len(points)]
+        # print('Divide: {}'.format(divide))
+        # print('Left: {}'.format(leftSide))
+        # print('Right: {}'.format(rightSide))
+        leftRes = divideHelper(leftSide)
+        rightRes = divideHelper(rightSide)
+        # print("Left dist: {}".format(leftRes.distance))
+        # print("Right dist: {}".format(rightRes.distance))
+        return leftRes if leftRes.distance < rightRes.distance else rightRes
+
+# Divide and Conquer Helper function. does the conquer
+def conquerHelper(res, points):
+    
+
+ 
+
 # Divide-And-Conquer algorithm for finding the smallest distance between two points
+# Thoughts:
+# 1) Sort points by X coordinate
+# 2) Recur on the left and right halves
+# Ex:
+# divideAndConquer([(3,4), (1,5), (0, -200), (100, 200), (235, -98)])
+# left side:
+# [(3,4), (1,5), (0, -200)]
+# [(3,4), (1,5)], [(0, -200)]
 # Usage: divideAndConquer( List<Point> ) -> Result
 def divideAndConquer(points):
-    return Result(None, None, None, len(points), "divide")
+    res = Result(None, None, None, None, None, None)
+    
+
+    start = time.time()
+    # 1) sort the points by X coordinate
+    sortedPoints = sortByX(points) 
+
+    # 2 ) Divde
+    res = divideHelper(sortedPoints)
+
+    # 3) Conquer
+    res = conquerHelper(res, sortedPoints)
+    
+    # 3) Set the result
+    end = time.time()
+    totalTime = (end-start) * 1000
+    
+    res.time = totalTime
+    res.n = len(points)
+
+    return res
 
 # Main Driver of file
 def main(argv):
