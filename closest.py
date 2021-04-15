@@ -41,7 +41,7 @@ class Result:
         self.time = time
     def __str__(self):
         # 5 25 (0,0) (3,4) n=4 brute      0.001s
-        if distance is not None:
+        if self.distance is not None:
             return "{:g} {} ({},{}) ({},{}) n={} {} {:9.3f}".format(self.distance, 
                                                     self.distance**2, 
                                                     self.point1.x,
