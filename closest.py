@@ -4,7 +4,7 @@
 # Spring 2021
 # Ben McClure
 
-import sys, math, time
+import sys, math, time, gc
 
 # Class representing a Point
 # 'x' is the x coordinate of the point
@@ -257,6 +257,7 @@ def divideAndConquer(points):
 
 # Main Driver of file
 def main(argv):
+    gc.enable()
     points = getPoints() # get list of points
     result = Result(None, None, None, None, None, None) # primary result
     auxResult = Result(None, None, None, None, None, None) # used if there is both in use
